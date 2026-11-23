@@ -45,7 +45,7 @@ public class BoletaService {
 
         double total = 0;
         for (ItemBoletaRequest item : request.items()) {
-            Producto producto = productoRepository.findById(item.productoId())
+            Producto producto = productoRepository.findByIdForUpdate(item.productoId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Producto no encontrado con id=" + item.productoId()));
 
@@ -110,6 +110,21 @@ public class BoletaService {
         }
         boleta.setEstado(EstadoBoleta.CANCELADA);
         log.warn("Boleta cancelada (id={}): stock devuelto", id);
+        return BoletaResponse.from(boletaRepository.save(boleta));
+    }
+
+    /** Confirma la entrega sin permitir transiciones desde una boleta cancelada. */
+    @Transactional
+    public BoletaResponse marcarEntregada(Long id) {
+        Boleta boleta = buscar(id);
+        if (boleta.getEstado() == EstadoBoleta.CANCELADA) {
+            throw new BusinessException("No se puede entregar una boleta cancelada");
+        }
+        if (boleta.getEstado() == EstadoBoleta.ENTREGADA) {
+            throw new BusinessException("La boleta ya fue marcada como entregada");
+        }
+        boleta.setEstado(EstadoBoleta.ENTREGADA);
+        log.info("Boleta entregada (id={})", id);
         return BoletaResponse.from(boletaRepository.save(boleta));
     }
 

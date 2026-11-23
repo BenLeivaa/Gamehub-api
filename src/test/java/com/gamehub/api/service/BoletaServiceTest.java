@@ -53,7 +53,7 @@ class BoletaServiceTest {
     @Test
     void crear_calculaTotalYDescuentaStock() {
         when(usuarioRepository.findByEmail("cliente@gamehub.cl")).thenReturn(Optional.of(cliente));
-        when(productoRepository.findById(10L)).thenReturn(Optional.of(consola));
+        when(productoRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(consola));
         when(boletaRepository.save(any(Boleta.class))).thenAnswer(inv -> inv.getArgument(0));
 
         BoletaResponse respuesta = boletaService.crear("cliente@gamehub.cl",
@@ -68,7 +68,7 @@ class BoletaServiceTest {
     @Test
     void crear_stockInsuficiente_lanzaBusinessException() {
         when(usuarioRepository.findByEmail("cliente@gamehub.cl")).thenReturn(Optional.of(cliente));
-        when(productoRepository.findById(10L)).thenReturn(Optional.of(consola));
+        when(productoRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(consola));
 
         BoletaRequest request = new BoletaRequest(List.of(new ItemBoletaRequest(10L, 99)));
 
@@ -81,7 +81,7 @@ class BoletaServiceTest {
     void crear_productoInactivo_lanzaBusinessException() {
         consola.setEstado(false);
         when(usuarioRepository.findByEmail("cliente@gamehub.cl")).thenReturn(Optional.of(cliente));
-        when(productoRepository.findById(10L)).thenReturn(Optional.of(consola));
+        when(productoRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(consola));
 
         BoletaRequest request = new BoletaRequest(List.of(new ItemBoletaRequest(10L, 1)));
 
@@ -91,7 +91,7 @@ class BoletaServiceTest {
     @Test
     void crear_productoInexistente_lanzaResourceNotFound() {
         when(usuarioRepository.findByEmail("cliente@gamehub.cl")).thenReturn(Optional.of(cliente));
-        when(productoRepository.findById(99L)).thenReturn(Optional.empty());
+        when(productoRepository.findByIdForUpdate(99L)).thenReturn(Optional.empty());
 
         BoletaRequest request = new BoletaRequest(List.of(new ItemBoletaRequest(99L, 1)));
 
@@ -117,6 +117,23 @@ class BoletaServiceTest {
         when(boletaRepository.findById(1L)).thenReturn(Optional.of(boleta));
 
         assertThrows(BusinessException.class, () -> boletaService.cancelar(1L));
+    }
+
+    @Test
+    void marcarEntregada_actualizaEstado() {
+        Boleta boleta = boletaConUnDetalle(EstadoBoleta.PENDIENTE, 1);
+        when(boletaRepository.findById(1L)).thenReturn(Optional.of(boleta));
+        when(boletaRepository.save(any(Boleta.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        BoletaResponse respuesta = boletaService.marcarEntregada(1L);
+
+        assertEquals(EstadoBoleta.ENTREGADA, respuesta.estado());
+    }
+
+    @Test
+    void marcarEntregada_canceladaLanzaBusinessException() {
+        when(boletaRepository.findById(1L)).thenReturn(Optional.of(boletaConUnDetalle(EstadoBoleta.CANCELADA, 1)));
+        assertThrows(BusinessException.class, () -> boletaService.marcarEntregada(1L));
     }
 
     @Test

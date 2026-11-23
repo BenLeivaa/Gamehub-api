@@ -56,4 +56,10 @@ public class BoletaController {
     public BoletaResponse cancelar(@PathVariable Long id) {
         return boletaService.cancelar(id);
     }
+
+    @Operation(summary = "Marcar una boleta como entregada", description = "Solo ADMINISTRADOR o VENDEDOR.")
+    @PatchMapping("/{id}/entregar")
+    public BoletaResponse marcarEntregada(@PathVariable Long id) {
+        return boletaService.marcarEntregada(id);
+    }
 }
