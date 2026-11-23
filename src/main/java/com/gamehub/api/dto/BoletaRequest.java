@@ -8,5 +8,7 @@ import java.util.List;
 public record BoletaRequest(
         @NotEmpty(message = "La compra debe tener al menos un producto")
         @Valid
-        List<ItemBoletaRequest> items) {
+        List<ItemBoletaRequest> items,
+        String codigoCupon) {
+    public BoletaRequest(List<ItemBoletaRequest> items) { this(items, null); }
 }

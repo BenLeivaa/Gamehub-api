@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/cupones/validar").hasAnyRole("CLIENTE", "ADMINISTRADOR")
 
                         // Boletas (órdenes). El orden importa: la primera regla que coincide gana.
                         .requestMatchers(HttpMethod.POST, "/api/v1/boletas").hasAnyRole("CLIENTE", "ADMINISTRADOR")
@@ -54,7 +55,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas/*").hasAnyRole("ADMINISTRADOR", "VENDEDOR", "CLIENTE")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/boletas/*/cancelar").hasRole("ADMINISTRADOR")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/boletas/*/entregar").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
+                        .requestMatchers("/api/v1/cupones/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/boletas/*/entregar").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/cupones/**").hasRole("ADMINISTRADOR")
 
                         // Todo lo demás (usuarios y crear/editar/borrar productos y categorías): solo administrador
                         .requestMatchers("/api/v1/usuarios/**").hasRole("ADMINISTRADOR")

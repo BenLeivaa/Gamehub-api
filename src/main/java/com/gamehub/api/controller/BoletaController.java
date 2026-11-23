@@ -58,7 +58,7 @@ public class BoletaController {
     }
 
     @Operation(summary = "Marcar una boleta como entregada", description = "Solo ADMINISTRADOR o VENDEDOR.")
-    @PatchMapping("/{id}/entregar")
+    @PostMapping("/{id}/entregar")
     public BoletaResponse marcarEntregada(@PathVariable Long id) {
         return boletaService.marcarEntregada(id);
     }

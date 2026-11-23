@@ -9,6 +9,7 @@ import com.gamehub.api.model.*;
 import com.gamehub.api.repository.BoletaRepository;
 import com.gamehub.api.repository.ProductoRepository;
 import com.gamehub.api.repository.UsuarioRepository;
+import com.gamehub.api.repository.CuponRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,6 +31,7 @@ public class BoletaService {
     private final BoletaRepository boletaRepository;
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CuponRepository cuponRepository;
 
     @Transactional
     public BoletaResponse crear(String emailUsuario, BoletaRequest request) {
@@ -68,6 +70,14 @@ public class BoletaService {
                     .subtotal(subtotal)
                     .build());
             total += subtotal;
+        }
+        if (request.codigoCupon() != null && !request.codigoCupon().isBlank()) {
+            Cupon cupon = cuponRepository.findByCodigoIgnoreCase(request.codigoCupon().trim())
+                    .orElseThrow(() -> new BusinessException("Cupón no válido"));
+            if (!Boolean.TRUE.equals(cupon.getActivo()) || !cupon.getExpiraEn().isAfter(LocalDateTime.now())) throw new BusinessException("Cupón vencido o no está activo");
+            double descuento = total * cupon.getPorcentaje() / 100.0;
+            if (cupon.getTope() != null) descuento = Math.min(descuento, cupon.getTope());
+            total -= descuento;
         }
         boleta.setTotal(total);
 
