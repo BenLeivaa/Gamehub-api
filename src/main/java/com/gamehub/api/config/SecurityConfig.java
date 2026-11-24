@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas/mis-compras").hasAnyRole("CLIENTE", "ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas/*").hasAnyRole("ADMINISTRADOR", "VENDEDOR", "CLIENTE")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/boletas/*/entregar").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/boletas/*/cancelar").hasRole("ADMINISTRADOR")
 
                         // Todo lo demás (usuarios y crear/editar/borrar productos y categorías): solo administrador

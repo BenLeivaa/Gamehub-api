@@ -1,10 +1,12 @@
 package com.gamehub.api.config;
 
 import com.gamehub.api.model.Categoria;
+import com.gamehub.api.model.Cupon;
 import com.gamehub.api.model.Producto;
 import com.gamehub.api.model.Rol;
 import com.gamehub.api.model.Usuario;
 import com.gamehub.api.repository.CategoriaRepository;
+import com.gamehub.api.repository.CuponRepository;
 import com.gamehub.api.repository.ProductoRepository;
 import com.gamehub.api.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
 
 /**
  * Al arrancar, si las tablas están vacías, carga datos de prueba.
@@ -23,7 +27,8 @@ public class DatosIniciales {
 
     @Bean
     CommandLineRunner cargarDatos(UsuarioRepository usuarios, CategoriaRepository categorias,
-                                  ProductoRepository productos, PasswordEncoder encoder) {
+                                  ProductoRepository productos, CuponRepository cupones,
+                                  PasswordEncoder encoder) {
         return args -> {
             if (usuarios.count() == 0) {
                 usuarios.save(usuario("Administrador GameHub", "admin@gamehub.cl", "Admin1234", Rol.ADMINISTRADOR, encoder));
@@ -49,6 +54,18 @@ public class DatosIniciales {
                     productos.save(producto("Control DualSense", "Sony", "PS5", 69990.0, 15, accesorios));
                 }
                 log.info("Categorías y productos de prueba creados");
+            }
+
+            // Conserva el código que ya conocían los usuarios, ahora persistente en Supabase.
+            if (cupones.findByCodigoIgnoreCase("GAMER10").isEmpty()) {
+                cupones.save(Cupon.builder()
+                        .codigo("GAMER10")
+                        .porcentaje(10)
+                        .tope(50000.0)
+                        .activo(true)
+                        .expiraEn(LocalDateTime.of(2026, 12, 31, 23, 59))
+                        .build());
+                log.info("Cupón inicial GAMER10 creado");
             }
         };
     }
