@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/cupones/validar").permitAll()
+                        .requestMatchers("/api/v1/cupones/**").hasRole("ADMINISTRADOR")
                         // Página de error interna de Spring: sin esto, un error 500 o 404 se ve como 401
                         .requestMatchers("/error").permitAll()
 
