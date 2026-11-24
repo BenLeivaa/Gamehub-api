@@ -47,7 +47,9 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/cupones/validar").hasAnyRole("CLIENTE", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/cupones/validar").permitAll()
+                        // Página de error interna de Spring: sin esto, un error 500 o 404 se ve como 401
+                        .requestMatchers("/error").permitAll()
 
                         // Boletas (órdenes). El orden importa: la primera regla que coincide gana.
                         .requestMatchers(HttpMethod.POST, "/api/v1/boletas").hasAnyRole("CLIENTE", "ADMINISTRADOR")
@@ -55,9 +57,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/boletas/*").hasAnyRole("ADMINISTRADOR", "VENDEDOR", "CLIENTE")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/boletas/*/cancelar").hasRole("ADMINISTRADOR")
-                        .requestMatchers("/api/v1/cupones/**").hasRole("ADMINISTRADOR")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/boletas/*/entregar").hasAnyRole("ADMINISTRADOR", "VENDEDOR")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/cupones/**").hasRole("ADMINISTRADOR")
 
                         // Todo lo demás (usuarios y crear/editar/borrar productos y categorías): solo administrador
                         .requestMatchers("/api/v1/usuarios/**").hasRole("ADMINISTRADOR")

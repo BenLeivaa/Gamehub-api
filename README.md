@@ -2,7 +2,7 @@
 
 API REST del backend de **GameHub Store**, una tienda de videojuegos y accesorios. Desarrollada con Spring Boot para la Evaluación Parcial 3 de Desarrollo Fullstack II (DSY1104). Gestiona productos, categorías, usuarios y boletas (órdenes de compra), con autenticación JWT y control de acceso por roles.
 
-- **Frontend (React):** _pegar aquí el enlace al repositorio del frontend_
+- **Frontend (React):** https://github.com/MilyQuintana/Proyecto_FullStack_2_React.git
 - **Documentación Swagger (local):** http://localhost:8080/swagger-ui.html
 
 ## Integrantes: 
